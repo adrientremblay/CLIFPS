@@ -1,7 +1,7 @@
 #include <iostream>
-using namespace std;
-
+#include <chronolibrary>
 #include <Windows.h>
+using namespace std;
 
 int screenWidth = 120;
 int screenHeight = 40;
@@ -46,20 +46,29 @@ int main()
     // game loop
     while (true)
     {
+        // controls
+        // handle rotation
+        float angularSpeed = 0.1f;
+        if (GetAsyncKeyState((unsigned short)'A') & 0x8000)
+            playerA -= (0.1f);
+        if (GetAsyncKeyState((unsigned short)'D') & 0x8000)
+            playerA += (0.1f);
+
         for (int x = 0; x < screenWidth; x++) {
             // for each column, calculate the projected ray angle into world space
             float rayAngle = (playerA - FOV / 2.0f) + ((float)x / (float)screenWidth) * FOV;
 
-            // calculating distance to wall
             float distanceToWall = 0;
             bool hitWall = false;
             while (!hitWall && distanceToWall < depth) {
+                // calculating distance to wall by incrementing each loop
                 distanceToWall += 0.1f;
 
-				// creating unit vector of ray angle
+				// creating unit X and Y projections of ray angle
 				float eyeX = sinf(rayAngle);
 				float eyeY = cosf(rayAngle);
 
+                // creating test coordinates on the map 
 				int testX = (int)(playerX + eyeX * distanceToWall);
 				int testY = (int)(playerY + eyeY * distanceToWall);
 
@@ -77,7 +86,7 @@ int main()
             }
 
             // calculating distance to ceiling and floor
-            int ceiling = (float)(screenHeight / 2.0f) - screenHeight / ((float)distanceToWall);
+            int ceiling = (int)((float)(screenHeight / 2.0f) - screenHeight / ((float)distanceToWall));
             int floor = screenHeight - ceiling;
 
             for (int y = 0; y < screenHeight; y++) {
