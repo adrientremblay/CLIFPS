@@ -6,14 +6,14 @@ using namespace std;
 int screenWidth = 120;
 int screenHeight = 40;
 
-float playerX = 0.0f;
-float playerY = 0.0f;
+float playerX = 8.0f;
+float playerY = 8.0f;
 float playerA = 0.0f;
 
 int mapHeight = 16;
 int mapWidth = 16;
 
-float FOV = 3.14159 / 4.0;
+float FOV = 3.14159f / 4.0f;
 
 float depth = 16.0f;
 
@@ -55,25 +55,38 @@ int main()
             bool hitWall = false;
             while (!hitWall && distanceToWall < depth) {
                 distanceToWall += 0.1f;
+
+				// creating unit vector of ray angle
+				float eyeX = sinf(rayAngle);
+				float eyeY = cosf(rayAngle);
+
+				int testX = (int)(playerX + eyeX * distanceToWall);
+				int testY = (int)(playerY + eyeY * distanceToWall);
+
+				// test if ray is out of bounds
+				if (testX < 0 || testX >= mapWidth || testY < 0 || testY >= mapHeight) {
+					hitWall = true;
+					distanceToWall = depth;
+				}
+				else {
+					// test if ray cell is a wall block
+					if (map[testY * mapWidth + testX] == '#') {
+						hitWall = true;
+					}
+				}
             }
 
-            // creating unit vector of ray angle
-            float eyeX = sinf(rayAngle);
-            float eyeY = cosf(rayAngle);
+            // calculating distance to ceiling and floor
+            int ceiling = (float)(screenHeight / 2.0f) - screenHeight / ((float)distanceToWall);
+            int floor = screenHeight - ceiling;
 
-            int testX = (int)(playerX + eyeX * distanceToWall);
-            int testY = (int)(playerY + eyeY * distanceToWall);
-
-            // test if ray is out of bounds
-            if (testX < 0 || testX >= mapWidth || testY < 0 || testY >= mapHeight) {
-                hitWall = true;
-                distanceToWall = depth;
-            }
-            else {
-                // test if ray cell is a wall block
-                if (map[testY * mapWidth + testX] == '#') {
-                    hitWall = true;
-                }
+            for (int y = 0; y < screenHeight; y++) {
+                if (y < ceiling) 
+                    screen[y * screenWidth + x] = ' ';
+                else if (y > ceiling && y <= floor)
+                    screen[y * screenWidth + x] = '#';
+                else 
+                    screen[y * screenWidth + x] = ' ';
             }
         }
 
