@@ -1,20 +1,85 @@
-// CLIFPS.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
-
 #include <iostream>
+using namespace std;
+
+#include <Windows.h>
+
+int screenWidth = 120;
+int screenHeight = 40;
+
+float playerX = 0.0f;
+float playerY = 0.0f;
+float playerA = 0.0f;
+
+int mapHeight = 16;
+int mapWidth = 16;
+
+float FOV = 3.14159 / 4.0;
+
+float depth = 16.0f;
 
 int main()
 {
-    std::cout << "Hello World!\n";
+    wchar_t* screen = new wchar_t[screenWidth * screenHeight];
+    HANDLE console = CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE, 0, NULL, CONSOLE_TEXTMODE_BUFFER, NULL);
+    SetConsoleActiveScreenBuffer(console);
+    DWORD bytesWritten = 0;
+
+    wstring map;
+
+    map += L"################";
+    map += L"#..............#";
+    map += L"#..............#";
+    map += L"#..............#";
+    map += L"#..............#";
+    map += L"#..............#";
+    map += L"#..............#";
+    map += L"#..............#";
+    map += L"#..............#";
+    map += L"#..............#";
+    map += L"#..............#";
+    map += L"#..............#";
+    map += L"#..............#";
+    map += L"#..............#";
+    map += L"#..............#";
+    map += L"################";
+
+    // game loop
+    while (true)
+    {
+        for (int x = 0; x < screenWidth; x++) {
+            // for each column, calculate the projected ray angle into world space
+            float rayAngle = (playerA - FOV / 2.0f) + ((float)x / (float)screenWidth) * FOV;
+
+            // calculating distance to wall
+            float distanceToWall = 0;
+            bool hitWall = false;
+            while (!hitWall && distanceToWall < depth) {
+                distanceToWall += 0.1f;
+            }
+
+            // creating unit vector of ray angle
+            float eyeX = sinf(rayAngle);
+            float eyeY = cosf(rayAngle);
+
+            int testX = (int)(playerX + eyeX * distanceToWall);
+            int testY = (int)(playerY + eyeY * distanceToWall);
+
+            // test if ray is out of bounds
+            if (testX < 0 || testX >= mapWidth || testY < 0 || testY >= mapHeight) {
+                hitWall = true;
+                distanceToWall = depth;
+            }
+            else {
+                // test if ray cell is a wall block
+                if (map[testY * mapWidth + testX] == '#') {
+                    hitWall = true;
+                }
+            }
+        }
+
+		screen[screenWidth * screenHeight - 1] = '\0';
+		WriteConsoleOutputCharacter(console, screen, screenWidth * screenHeight, { 0, 0 }, &bytesWritten);
+    }
+
+    return 0;
 }
-
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-// Debug program: F5 or Debug > Start Debugging menu
-
-// Tips for Getting Started: 
-//   1. Use the Solution Explorer window to add/manage files
-//   2. Use the Team Explorer window to connect to source control
-//   3. Use the Output window to see build output and other messages
-//   4. Use the Error List window to view errors
-//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
-//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
