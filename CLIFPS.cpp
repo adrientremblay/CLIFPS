@@ -99,11 +99,23 @@ int main()
             int ceiling = (int)((float)(screenHeight / 2.0f) - screenHeight / ((float)distanceToWall));
             int floor = screenHeight - ceiling;
 
+            short shade;
+            if (distanceToWall <= depth / 4.0f)
+                shade = 0x2588;
+            else if (distanceToWall <= depth / 3.0f)
+                shade = 0x2593;
+            else if (distanceToWall <= depth / 2.0f)
+                shade = 0x2592;
+            else if (distanceToWall <= depth)
+                shade = 0x2591;
+            else
+                shade = ' ';
+
             for (int y = 0; y < screenHeight; y++) {
                 if (y < ceiling) 
                     screen[y * screenWidth + x] = ' ';
                 else if (y > ceiling && y <= floor)
-                    screen[y * screenWidth + x] = '#';
+                    screen[y * screenWidth + x] = shade;
                 else 
                     screen[y * screenWidth + x] = ' ';
             }
