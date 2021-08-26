@@ -60,9 +60,18 @@ int main()
         // handle rotation
         float angularSpeed = 0.1f;
         if (GetAsyncKeyState((unsigned short)'A') & 0x8000)
-            playerA -= (0.1f) * elapsedTime;
+            playerA -= (0.5f) * elapsedTime;
         if (GetAsyncKeyState((unsigned short)'D') & 0x8000)
-            playerA += (0.1f) * elapsedTime;
+            playerA += (0.5f) * elapsedTime;
+        // handle movement
+        if (GetAsyncKeyState((unsigned short)'W') & 0x8000) {
+            playerX += cosf(playerA) * 5.0f * elapsedTime;
+            playerY += sinf(playerA) * 5.0f * elapsedTime;
+        }
+        if (GetAsyncKeyState((unsigned short)'S') & 0x8000) {
+            playerX -= cosf(playerA) * 5.0f * elapsedTime;
+            playerY -= sinf(playerA) * 5.0f * elapsedTime;
+        }
 
         for (int x = 0; x < screenWidth; x++) {
             // for each column, calculate the projected ray angle into world space
@@ -75,8 +84,8 @@ int main()
                 distanceToWall += 0.1f;
 
 				// creating unit X and Y projections of ray angle
-				float eyeX = sinf(rayAngle);
-				float eyeY = cosf(rayAngle);
+				float eyeX = cosf(rayAngle);
+				float eyeY = sinf(rayAngle);
 
                 // creating test coordinates on the map 
 				int testX = (int)(playerX + eyeX * distanceToWall);
