@@ -1,5 +1,5 @@
 #include <iostream>
-#include <chronolibrary>
+#include <chrono>
 #include <Windows.h>
 using namespace std;
 
@@ -43,16 +43,26 @@ int main()
     map += L"#..............#";
     map += L"################";
 
+    auto tp1 = chrono::system_clock::now();
+    auto tp2 = chrono::system_clock::now();
+
+
     // game loop
     while (true)
     {
+        // smoothing frames
+		tp2 = chrono::system_clock::now();
+        chrono::duration<float> timeDifference = tp2 - tp1;
+        tp1 = tp2;
+        float elapsedTime = timeDifference.count();
+
         // controls
         // handle rotation
         float angularSpeed = 0.1f;
         if (GetAsyncKeyState((unsigned short)'A') & 0x8000)
-            playerA -= (0.1f);
+            playerA -= (0.1f) * elapsedTime;
         if (GetAsyncKeyState((unsigned short)'D') & 0x8000)
-            playerA += (0.1f);
+            playerA += (0.1f) * elapsedTime;
 
         for (int x = 0; x < screenWidth; x++) {
             // for each column, calculate the projected ray angle into world space
