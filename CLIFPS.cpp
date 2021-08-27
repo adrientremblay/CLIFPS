@@ -3,29 +3,29 @@
 #include <Windows.h>
 using namespace std;
 
-int screenWidth = 120;
-int screenHeight = 40;
+const int screenWidth = 120;
+const int screenHeight = 40;
 
 float playerX = 8.0f;
 float playerY = 8.0f;
 float playerA = 0.0f;
 
-int mapHeight = 16;
-int mapWidth = 16;
+const int mapHeight = 16;
+const int mapWidth = 16;
+const float depth = 16.0f;
 
-float FOV = 3.14159f / 4.0f;
-
-float depth = 16.0f;
+const float FOV = 3.14159f / 4.0f;
 
 int main()
 {
+    // creating console: object to write screen to, and screen
     wchar_t* screen = new wchar_t[screenWidth * screenHeight];
     HANDLE console = CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE, 0, NULL, CONSOLE_TEXTMODE_BUFFER, NULL);
     SetConsoleActiveScreenBuffer(console);
     DWORD bytesWritten = 0;
 
+    // defining map
     wstring map;
-
     map += L"################";
     map += L"#..............#";
     map += L"#..............#";
@@ -45,7 +45,6 @@ int main()
 
     auto tp1 = chrono::system_clock::now();
     auto tp2 = chrono::system_clock::now();
-
 
     // game loop
     while (true)
@@ -108,6 +107,7 @@ int main()
             int ceiling = (int)((float)(screenHeight / 2.0f) - screenHeight / ((float)distanceToWall));
             int floor = screenHeight - ceiling;
 
+            // picking wall shade based on distance
             short shade;
             if (distanceToWall <= depth / 4.0f)
                 shade = 0x2588;
